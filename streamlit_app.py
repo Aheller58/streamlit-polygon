@@ -28,7 +28,7 @@ if 'forecasted_closings' not in st.session_state:
     st.session_state.forecasted_closings = 0.0
 if 'forecasted_revenue' not in st.session_state:
     st.session_state.forecasted_revenue = 0.0
-
+    
 # Improved CSS for styling
 st.markdown("""
     <style>
@@ -448,19 +448,20 @@ def main():
                     )
 
                     if prediction_status == "success":
-                        forecasted_revenue = forecasted_closings * average_revenue_per_closing
+                        st.session_state.forecasted_closings = forecasted_closings
+                        st.session_state.forecasted_revenue = forecasted_closings * average_revenue_per_closing
 
                         col1, col2 = st.columns(2)
                         with col1:
                             st.metric(
                                 "Forecasted Closings",
-                                f"{forecasted_closings:.1f}",
+                                f"{st.session_state.forecasted_closings:.1f}",
                                 help="Predicted number of closings based on current leads and appointments"
                             )
                         with col2:
                             st.metric(
                                 "Forecasted Revenue",
-                                f"${forecasted_revenue:,.2f}",
+                                f"${st.session_state.forecasted_revenue:,.2f}",
                                 help="Predicted revenue based on forecasted closings"
                             )
 
@@ -499,10 +500,10 @@ def main():
         with tab4:
             st.header("Export Data")
             if not st.session_state.historical_data.empty:
-                # Prepare forecast data
+                # Prepare forecast data using session state variables
                 forecast_data = {
                     'Metric': ['Forecasted Closings', 'Forecasted Revenue'],
-                    'Value': [forecasted_closings, forecasted_revenue],
+                    'Value': [st.session_state.forecasted_closings, st.session_state.forecasted_revenue],
                     'Date': [datetime.now().strftime('%Y-%m-%d')] * 2
                 }
 
