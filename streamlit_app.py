@@ -24,6 +24,10 @@ if 'forecasted_closings' not in st.session_state:
     st.session_state.forecasted_closings = 0.0
 if 'forecasted_revenue' not in st.session_state:
     st.session_state.forecasted_revenue = 0.0
+if 'reset_clicked' not in st.session_state:
+    st.session_state.reset_clicked = False
+if 'clear_upload_clicked' not in st.session_state:
+    st.session_state.clear_upload_clicked = False
 
 # Improved CSS for styling
 st.markdown("""
@@ -75,12 +79,8 @@ ModelType = LinearRegression
 
 def reset_data():
     """Reset all data states to initial values"""
-    st.session_state.historical_data = pd.DataFrame()
-    st.session_state.uploaded_data = None
-    st.session_state.combined_data = pd.DataFrame()
-    st.session_state.forecasted_closings = 0.0
-    st.session_state.forecasted_revenue = 0.0
-    st.rerun()  # Changed from st.experimental_rerun()
+    for key in list(st.session_state.keys()):
+        del st.session_state[key]
 
 def generate_sample_data() -> pd.DataFrame:
     """Generate sample data for demonstration."""
@@ -283,10 +283,17 @@ def main():
             col1, col2 = st.columns([1, 3])
             with col1:
                 if st.button("🔄 Reset All Data", type="primary"):
+                    st.session_state.reset_clicked = True
+                
+                if st.session_state.reset_clicked:
                     st.warning("Are you sure you want to reset all data?")
-                    reset_confirmed = st.button("Yes, Reset Everything", key="confirm_reset")
-                    if reset_confirmed:
-                        reset_data()
+                    col1, col2 = st.columns(2)
+                    with col1:
+                        if st.button("Yes, Reset"):
+                            reset_data()
+                    with col2:
+                        if st.button("No, Cancel"):
+                            st.session_state.reset_clicked = False
 
             st.header("Input Your Data")
             col1, col2 = st.columns(2)
@@ -312,16 +319,8 @@ def main():
                     format="%.2f"
                 )
 
-            st.header("Upload Historical Data")
-
-            # Add separate reset button for uploaded data
-            if st.session_state.uploaded_data is not None:
-                if st.button("Clear Uploaded Data"):
-                    st.session_state.uploaded_data = None
-                    st.rerun()  # Changed from st.experimental_rerun()
-            
-        # Sample data and templates
-        st.subheader("Download Templates")
+            # Sample data and templates
+            st.subheader("Download Templates")
             col1, col2 = st.columns(2)
             
             with col1:
