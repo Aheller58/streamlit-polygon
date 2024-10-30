@@ -256,7 +256,7 @@ if 'historical_data' not in st.session_state:
 
 def main():
     """Main application function"""
-    st.title("Sales Pipeline Analytics Dashboard")
+    st.title("SalesStak Pipeline Analytics Dashboard")
 
     with st.container():
         tab1, tab2, tab3, tab4 = st.tabs(["📝 Input & Upload", "📊 Analysis", "📈 Forecasting", "💾 Export"])
