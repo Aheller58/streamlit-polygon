@@ -10,8 +10,16 @@ import io
 from typing import Dict, Union, Optional, Tuple, Any
 from datetime import datetime
 
-# Configuration and setup
+# Configuration and setup must be first Streamlit command
 st.set_page_config(layout="wide")
+
+# Initialize session states
+if 'historical_data' not in st.session_state:
+    st.session_state.historical_data = pd.DataFrame()
+if 'uploaded_data' not in st.session_state:
+    st.session_state.uploaded_data = None
+if 'combined_data' not in st.session_state:
+    st.session_state.combined_data = pd.DataFrame()
 
 # Improved CSS for styling
 st.markdown("""
@@ -61,10 +69,17 @@ MetricsDict = Dict[str, Union[float, str, int]]
 DataFrameType = pd.DataFrame
 ModelType = LinearRegression
 
+def reset_data():
+    """Reset all data states to initial values"""
+    st.session_state.historical_data = pd.DataFrame()
+    st.session_state.uploaded_data = None
+    st.session_state.combined_data = pd.DataFrame()
+    st.experimental_rerun()
+
 def generate_sample_data() -> pd.DataFrame:
     """Generate sample data for demonstration."""
     sample_data = {
-        'month': pd.date_range(start='2023-01-01', periods=12, freq='ME'),  # Fixed frequency
+        'month': pd.date_range(start='2023-01-01', periods=12, freq='ME'),
         'leads': np.random.randint(80, 120, 12),
         'appointments': np.random.randint(40, 60, 12),
         'closings': np.random.randint(20, 30, 12),
