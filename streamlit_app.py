@@ -20,6 +20,10 @@ if 'uploaded_data' not in st.session_state:
     st.session_state.uploaded_data = None
 if 'combined_data' not in st.session_state:
     st.session_state.combined_data = pd.DataFrame()
+if 'forecasted_closings' not in st.session_state:
+    st.session_state.forecasted_closings = 0.0
+if 'forecasted_revenue' not in st.session_state:
+    st.session_state.forecasted_revenue = 0.0
 
 # Improved CSS for styling
 st.markdown("""
@@ -74,6 +78,8 @@ def reset_data():
     st.session_state.historical_data = pd.DataFrame()
     st.session_state.uploaded_data = None
     st.session_state.combined_data = pd.DataFrame()
+    st.session_state.forecasted_closings = 0.0
+    st.session_state.forecasted_revenue = 0.0
     st.experimental_rerun()
 
 def generate_sample_data() -> pd.DataFrame:
@@ -265,32 +271,9 @@ def export_to_excel(df: DataFrameType, forecasts: Dict[str, Any]) -> bytes:
         pd.DataFrame(forecasts).to_excel(writer, sheet_name='Forecasts', index=False)
     return output.getvalue()
 
-# Initialize session state
-if 'historical_data' not in st.session_state:
-    st.session_state.historical_data = pd.DataFrame()
-
-# Add this near the top of the file with other session state initializations
-if 'historical_data' not in st.session_state:
-    st.session_state.historical_data = pd.DataFrame()
-if 'uploaded_data' not in st.session_state:
-    st.session_state.uploaded_data = None
-if 'combined_data' not in st.session_state:
-    st.session_state.combined_data = pd.DataFrame()
-
-def reset_data():
-    """Reset all data states to initial values"""
-    st.session_state.historical_data = pd.DataFrame()
-    st.session_state.uploaded_data = None
-    st.session_state.combined_data = pd.DataFrame()
-    st.experimental_rerun()
-
 def main():
     """Main application function"""
     st.title("SalesStak Pipeline Analytics Dashboard")
-
-    # Initialize forecast variables
-    forecasted_closings = 0.0
-    forecasted_revenue = 0.0
 
     with st.container():
         tab1, tab2, tab3, tab4 = st.tabs(["📝 Input & Upload", "📊 Analysis", "📈 Forecasting", "💾 Export"])
@@ -448,19 +431,21 @@ def main():
                     )
 
                     if prediction_status == "success":
-                        forecasted_revenue = forecasted_closings * average_revenue_per_closing
+                        # Update session state with new forecasts
+                        st.session_state.forecasted_closings = forecasted_closings
+                        st.session_state.forecasted_revenue = forecasted_closings * average_revenue_per_closing
 
                         col1, col2 = st.columns(2)
                         with col1:
                             st.metric(
                                 "Forecasted Closings",
-                                f"{forecasted_closings:.1f}",
+                                f"{st.session_state.forecasted_closings:.1f}",
                                 help="Predicted number of closings based on current leads and appointments"
                             )
                         with col2:
                             st.metric(
                                 "Forecasted Revenue",
-                                f"${forecasted_revenue:,.2f}",
+                                f"${st.session_state.forecasted_revenue:,.2f}",
                                 help="Predicted revenue based on forecasted closings"
                             )
 
@@ -499,10 +484,10 @@ def main():
         with tab4:
             st.header("Export Data")
             if not st.session_state.historical_data.empty:
-                # Now these variables are guaranteed to exist
+                # Use session state variables for forecast data
                 forecast_data = {
                     'Metric': ['Forecasted Closings', 'Forecasted Revenue'],
-                    'Value': [forecasted_closings, forecasted_revenue],
+                    'Value': [st.session_state.forecasted_closings, st.session_state.forecasted_revenue],
                     'Date': [datetime.now().strftime('%Y-%m-%d')] * 2
                 }
 
