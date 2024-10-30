@@ -80,7 +80,7 @@ def reset_data():
     st.session_state.combined_data = pd.DataFrame()
     st.session_state.forecasted_closings = 0.0
     st.session_state.forecasted_revenue = 0.0
-    st.experimental_rerun()
+    st.rerun()  # Changed from st.experimental_rerun()
 
 def generate_sample_data() -> pd.DataFrame:
     """Generate sample data for demonstration."""
@@ -316,9 +316,9 @@ def main():
             
             # Add separate reset button for uploaded data
             if st.session_state.uploaded_data is not None:
-                if st.button("Clear Uploaded Data"):
-                    st.session_state.uploaded_data = None
-                    st.experimental_rerun()
+            if st.button("Clear Uploaded Data"):
+            st.session_state.uploaded_data = None
+            st.rerun()  # Changed from st.experimental_rerun()
             
             # Sample data and templates
             st.subheader("Download Templates")
