@@ -10,7 +10,7 @@ import io
 from typing import Dict, Union, Optional, Tuple, Any
 from datetime import datetime
 
-# Configuration and setup must be first Streamlit command
+# Configuration and setup
 st.set_page_config(layout="wide")
 
 # Initialize session states
@@ -20,14 +20,6 @@ if 'uploaded_data' not in st.session_state:
     st.session_state.uploaded_data = None
 if 'combined_data' not in st.session_state:
     st.session_state.combined_data = pd.DataFrame()
-if 'forecasted_closings' not in st.session_state:
-    st.session_state.forecasted_closings = 0.0
-if 'forecasted_revenue' not in st.session_state:
-    st.session_state.forecasted_revenue = 0.0
-if 'reset_clicked' not in st.session_state:
-    st.session_state.reset_clicked = False
-if 'clear_upload_clicked' not in st.session_state:
-    st.session_state.clear_upload_clicked = False
 
 # Improved CSS for styling
 st.markdown("""
@@ -79,8 +71,10 @@ ModelType = LinearRegression
 
 def reset_data():
     """Reset all data states to initial values"""
-    for key in list(st.session_state.keys()):
-        del st.session_state[key]
+    st.session_state.historical_data = pd.DataFrame()
+    st.session_state.uploaded_data = None
+    st.session_state.combined_data = pd.DataFrame()
+    st.experimental_rerun()
 
 def generate_sample_data() -> pd.DataFrame:
     """Generate sample data for demonstration."""
@@ -283,17 +277,10 @@ def main():
             col1, col2 = st.columns([1, 3])
             with col1:
                 if st.button("🔄 Reset All Data", type="primary"):
-                    st.session_state.reset_clicked = True
-                
-                if st.session_state.reset_clicked:
                     st.warning("Are you sure you want to reset all data?")
-                    col1, col2 = st.columns(2)
-                    with col1:
-                        if st.button("Yes, Reset"):
-                            reset_data()
-                    with col2:
-                        if st.button("No, Cancel"):
-                            st.session_state.reset_clicked = False
+                    reset_confirmed = st.button("Yes, Reset Everything", key="confirm_reset")
+                    if reset_confirmed:
+                        reset_data()
 
             st.header("Input Your Data")
             col1, col2 = st.columns(2)
@@ -319,6 +306,14 @@ def main():
                     format="%.2f"
                 )
 
+            st.header("Upload Historical Data")
+            
+            # Add separate reset button for uploaded data
+            if st.session_state.uploaded_data is not None:
+                if st.button("Clear Uploaded Data"):
+                    st.session_state.uploaded_data = None
+                    st.experimental_rerun()
+            
             # Sample data and templates
             st.subheader("Download Templates")
             col1, col2 = st.columns(2)
@@ -430,21 +425,19 @@ def main():
                     )
 
                     if prediction_status == "success":
-                        # Update session state with new forecasts
-                        st.session_state.forecasted_closings = forecasted_closings
-                        st.session_state.forecasted_revenue = forecasted_closings * average_revenue_per_closing
+                        forecasted_revenue = forecasted_closings * average_revenue_per_closing
 
                         col1, col2 = st.columns(2)
                         with col1:
                             st.metric(
                                 "Forecasted Closings",
-                                f"{st.session_state.forecasted_closings:.1f}",
+                                f"{forecasted_closings:.1f}",
                                 help="Predicted number of closings based on current leads and appointments"
                             )
                         with col2:
                             st.metric(
                                 "Forecasted Revenue",
-                                f"${st.session_state.forecasted_revenue:,.2f}",
+                                f"${forecasted_revenue:,.2f}",
                                 help="Predicted revenue based on forecasted closings"
                             )
 
@@ -483,10 +476,10 @@ def main():
         with tab4:
             st.header("Export Data")
             if not st.session_state.historical_data.empty:
-                # Use session state variables for forecast data
+                # Prepare forecast data
                 forecast_data = {
                     'Metric': ['Forecasted Closings', 'Forecasted Revenue'],
-                    'Value': [st.session_state.forecasted_closings, st.session_state.forecasted_revenue],
+                    'Value': [forecasted_closings, forecasted_revenue],
                     'Date': [datetime.now().strftime('%Y-%m-%d')] * 2
                 }
 
