@@ -79,8 +79,14 @@ ModelType = LinearRegression
 
 def reset_data():
     """Reset all data states to initial values"""
-    for key in list(st.session_state.keys()):
-        del st.session_state[key]
+    st.session_state.historical_data = pd.DataFrame()
+    st.session_state.uploaded_data = None
+    st.session_state.combined_data = pd.DataFrame()
+    st.session_state.reset_clicked = False
+    st.session_state.clear_upload_clicked = False
+    st.session_state.forecasted_closings = 0.0
+    st.session_state.forecasted_revenue = 0.0
+    st.rerun()
 
 def generate_sample_data() -> pd.DataFrame:
     """Generate sample data for demonstration."""
