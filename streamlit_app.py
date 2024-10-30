@@ -288,6 +288,10 @@ def main():
     """Main application function"""
     st.title("SalesStak Pipeline Analytics Dashboard")
 
+    # Initialize forecast variables
+    forecasted_closings = 0.0
+    forecasted_revenue = 0.0
+
     with st.container():
         tab1, tab2, tab3, tab4 = st.tabs(["📝 Input & Upload", "📊 Analysis", "📈 Forecasting", "💾 Export"])
 
