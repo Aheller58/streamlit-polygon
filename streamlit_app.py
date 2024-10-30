@@ -152,21 +152,21 @@ def add_goals_tracking(df: DataFrameType) -> None:
         return (actual / goal * 100) if goal > 0 else 0
 
     with col1:
-        lead_goal = st.number_input("Monthly Leads Goal:", min_value=0, step=1, value=100)  # Integer
+        lead_goal = st.number_input("Monthly Leads Goal:", min_value=0, step=1, value=100)
         actual_leads = df['leads'].iloc[-1] if not df.empty else 0
         leads_progress = calculate_progress(actual_leads, lead_goal)
         st.progress(min(leads_progress / 100, 1.0))
         st.write(f"Latest: {actual_leads:.0f} ({leads_progress:.1f}% of goal)")
 
     with col2:
-        appointment_goal = st.number_input("Monthly Appointments Goal:", min_value=0, step=1, value=10)  # Integer
+        appointment_goal = st.number_input("Monthly Appointments Goal:", min_value=0, step=1, value=10)
         actual_appointments = df['appointments'].iloc[-1] if not df.empty else 0
         appointments_progress = calculate_progress(actual_appointments, appointment_goal)
         st.progress(min(appointments_progress / 100, 1.0))
         st.write(f"Latest: {actual_appointments:.0f} ({appointments_progress:.1f}% of goal)")
 
     with col3:
-        closing_goal = st.number_input("Monthly Closings Goal:", min_value=0, step=1, value=2)  # Integer
+        closing_goal = st.number_input("Monthly Closings Goal:", min_value=0, step=1, value=2)
         actual_closings = df['closings'].iloc[-1] if not df.empty else 0
         closings_progress = calculate_progress(actual_closings, closing_goal)
         st.progress(min(closings_progress / 100, 1.0))
