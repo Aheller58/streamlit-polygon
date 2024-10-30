@@ -499,7 +499,7 @@ def main():
         with tab4:
             st.header("Export Data")
             if not st.session_state.historical_data.empty:
-                # Prepare forecast data
+                # Now these variables are guaranteed to exist
                 forecast_data = {
                     'Metric': ['Forecasted Closings', 'Forecasted Revenue'],
                     'Value': [forecasted_closings, forecasted_revenue],
