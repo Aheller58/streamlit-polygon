@@ -20,6 +20,10 @@ if 'uploaded_data' not in st.session_state:
     st.session_state.uploaded_data = None
 if 'combined_data' not in st.session_state:
     st.session_state.combined_data = pd.DataFrame()
+if 'reset_clicked' not in st.session_state:
+    st.session_state.reset_clicked = False
+if 'clear_upload_clicked' not in st.session_state:
+    st.session_state.clear_upload_clicked = False
 
 # Improved CSS for styling
 st.markdown("""
@@ -74,7 +78,8 @@ def reset_data():
     st.session_state.historical_data = pd.DataFrame()
     st.session_state.uploaded_data = None
     st.session_state.combined_data = pd.DataFrame()
-    st.experimental_rerun()
+    st.session_state.reset_clicked = False
+    st.rerun()  # Changed from st.experimental_rerun()
 
 def generate_sample_data() -> pd.DataFrame:
     """Generate sample data for demonstration."""
@@ -277,10 +282,17 @@ def main():
             col1, col2 = st.columns([1, 3])
             with col1:
                 if st.button("🔄 Reset All Data", type="primary"):
+                    st.session_state.reset_clicked = True
+                
+                if st.session_state.reset_clicked:
                     st.warning("Are you sure you want to reset all data?")
-                    reset_confirmed = st.button("Yes, Reset Everything", key="confirm_reset")
-                    if reset_confirmed:
-                        reset_data()
+                    col1, col2 = st.columns(2)
+                    with col1:
+                        if st.button("Yes, Reset"):
+                            reset_data()
+                    with col2:
+                        if st.button("No, Cancel"):
+                            st.session_state.reset_clicked = False
 
             st.header("Input Your Data")
             col1, col2 = st.columns(2)
@@ -311,8 +323,18 @@ def main():
             # Add separate reset button for uploaded data
             if st.session_state.uploaded_data is not None:
                 if st.button("Clear Uploaded Data"):
-                    st.session_state.uploaded_data = None
-                    st.experimental_rerun()
+                    st.session_state.clear_upload_clicked = True
+                
+                if st.session_state.clear_upload_clicked:
+                    st.warning("Are you sure you want to clear the uploaded data?")
+                    col1, col2 = st.columns(2)
+                    with col1:
+                        if st.button("Yes, Clear"):
+                            st.session_state.uploaded_data = None
+                            st.session_state.clear_upload_clicked = False
+                    with col2:
+                        if st.button("No, Keep"):
+                            st.session_state.clear_upload_clicked = False
             
             # Sample data and templates
             st.subheader("Download Templates")
