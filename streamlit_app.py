@@ -320,8 +320,8 @@ def main():
                     st.session_state.uploaded_data = None
                     st.rerun()  # Changed from st.experimental_rerun()
             
-            # Sample data and templates
-            st.subheader("Download Templates")
+        # Sample data and templates
+        st.subheader("Download Templates")
             col1, col2 = st.columns(2)
             
             with col1:
