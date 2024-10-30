@@ -24,6 +24,10 @@ if 'reset_clicked' not in st.session_state:
     st.session_state.reset_clicked = False
 if 'clear_upload_clicked' not in st.session_state:
     st.session_state.clear_upload_clicked = False
+if 'forecasted_closings' not in st.session_state:
+    st.session_state.forecasted_closings = 0.0
+if 'forecasted_revenue' not in st.session_state:
+    st.session_state.forecasted_revenue = 0.0
 
 # Improved CSS for styling
 st.markdown("""
@@ -75,11 +79,8 @@ ModelType = LinearRegression
 
 def reset_data():
     """Reset all data states to initial values"""
-    st.session_state.historical_data = pd.DataFrame()
-    st.session_state.uploaded_data = None
-    st.session_state.combined_data = pd.DataFrame()
-    st.session_state.reset_clicked = False
-    st.rerun()  # Changed from st.experimental_rerun()
+    for key in list(st.session_state.keys()):
+        del st.session_state[key]
 
 def generate_sample_data() -> pd.DataFrame:
     """Generate sample data for demonstration."""
@@ -406,9 +407,12 @@ def main():
 
         with tab2:
             if not st.session_state.historical_data.empty:
-                filtered_data = st.session_state.historical_data
-                add_goals_tracking(filtered_data)
-                create_metrics_dashboard(filtered_data)
+                # Prepare forecast data
+                forecast_data = {
+                    'Metric': ['Forecasted Closings', 'Forecasted Revenue'],
+                    'Value': [st.session_state.forecasted_closings, st.session_state.forecasted_revenue],
+                    'Date': [datetime.now().strftime('%Y-%m-%d')] * 2
+                }
 
                 st.header("Performance Analysis")
                 plot_interactive_trends(filtered_data)
