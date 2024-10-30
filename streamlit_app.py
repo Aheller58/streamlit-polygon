@@ -407,12 +407,9 @@ def main():
 
         with tab2:
             if not st.session_state.historical_data.empty:
-                # Prepare forecast data
-                forecast_data = {
-                    'Metric': ['Forecasted Closings', 'Forecasted Revenue'],
-                    'Value': [st.session_state.forecasted_closings, st.session_state.forecasted_revenue],
-                    'Date': [datetime.now().strftime('%Y-%m-%d')] * 2
-                }
+                filtered_data = st.session_state.historical_data.copy()  # Create a copy of the data
+                add_goals_tracking(filtered_data)
+                create_metrics_dashboard(filtered_data)
 
                 st.header("Performance Analysis")
                 plot_interactive_trends(filtered_data)
