@@ -315,10 +315,10 @@ def main():
             st.header("Upload Historical Data")
 
             # Add separate reset button for uploaded data
-                if st.session_state.uploaded_data is not None:
-                if st.button("Clear Uploaded Data"):
-                    st.session_state.uploaded_data = None
-                    st.rerun()  # Changed from st.experimental_rerun()
+if st.session_state.uploaded_data is not None:
+    if st.button("Clear Uploaded Data"):
+        st.session_state.uploaded_data = None
+        st.rerun()  # Changed from st.experimental_rerun()
             
             # Sample data and templates
             st.subheader("Download Templates")
